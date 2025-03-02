@@ -1,5 +1,6 @@
 # Imports
-import requests, json, time, os, websocket, threading, ssl, sys, select, datetime, subprocess, random; from colorama import Fore, Back, Style
+import requests, json, time, os, websocket, threading, ssl, sys, select, datetime, subprocess, random
+from colorama import Fore, Back, Style
 if os.name == 'nt':
     import msvcrt
 
@@ -104,8 +105,10 @@ def onlineLoop():
 def online():
     status=data.get('status');customStatus=data.get('customStatus')
     ws=websocket.WebSocket();ws.connect('wss://gateway.discord.gg/?v=9&encoding=json');cool=json.loads(ws.recv());heartbeat=cool['d']['heartbeat_interval']
-    auth={"op":2,"d":{"token":token,"properties":{"$os":"Windows 11","$browser":"Mozilla Firefox","$device":"Windows",},"presence":{"status":status,"afk":False},},"s":None,"t":None,};ws.send(json.dumps(auth))
+    auth={"op":2,"d":{"token":token,"properties":{"$os":"Windows 11","$browser":"Mozilla Firefox","$device":"Windows",},"presence":{"status":status,"afk":False},},"s":None,"t":None,}
+    ws.send(json.dumps(auth))
     yes={"op":3,"d":{"since":0,"activities":[{"type":4,"state":customStatus,"name":"Custom Status","id":"custom"}],"status":status,"afk":False,}}
+    
     def send_heartbeat():
         while 1:ws.send(json.dumps(yes));time.sleep(heartbeat/1000)
     threading.Thread(target=send_heartbeat).start()
@@ -151,15 +154,28 @@ def clearConsole():
 
 # Advertiser menu
 def advertiser():
-    while 1:clearConsole();choice=input(Fore.RED+"Advertiser:\n"+Fore.YELLOW+"1. Start advertiser\n2. Add channel\n3. Remove channel\n4. Change message\n5. Change delay\n6. Change DM Response\n7. Auto DM Response\n8. Leave\n");{'1':lambda:sendMessage(),'2':lambda:modifyChannels('add'),'3':lambda:modifyChannels('remove'),'4':lambda:changeMessage(),'5':lambda:changeDelay(),'6':lambda:changeDMResponse(),'7':lambda:(threading.Thread(target=autoReplyLoop).start(),print("Started Auto DM Responder")),'8':lambda:main()}.get(choice,lambda:print('Invalid choice'))();time.sleep(3)
+    while 1:
+        clearConsole()
+        choice=input(Fore.RED+"Advertiser:\n"+Fore.YELLOW+"1. Start advertiser\n2. Add channel\n3. Remove channel\n4. Change message\n5. Change delay\n6. Change DM Response\n7. Auto DM Response\n8. Leave\n")
+        {'1':lambda:sendMessage(),'2':lambda:modifyChannels('add'),'3':lambda:modifyChannels('remove'),'4':lambda:changeMessage(),'5':lambda:changeDelay(),'6':lambda:changeDMResponse(),'7':lambda:(threading.Thread(target=autoReplyLoop).start(),print("Started Auto DM Responder")),'8':lambda:main()}.get(choice,lambda:print('Invalid choice'))()
+        time.sleep(3)
 
 # Onliner menu
 def onliner():
-    while True:clearConsole();choice = input(Fore.RED + "Onliner:\n" + Fore.YELLOW + "1. Start onliner\n2. Change status\n3. Change custom status\n4. Leave\n");{'1': lambda: (threading.Thread(target=onlineLoop).start(), print("Started onliner")),'2': changeStatus,'3': changeCustomStatus,'4':lambda:main()}.get(choice, lambda: print("Invalid choice"))();time.sleep(3)
+    while True:
+        clearConsole()
+        choice = input(Fore.RED + "Onliner:\n" + Fore.YELLOW + "1. Start onliner\n2. Change status\n3. Change custom status\n4. Leave\n")
+        {'1': lambda: (threading.Thread(target=onlineLoop).start(), print("Started onliner")),'2': changeStatus,'3': changeCustomStatus,'4':lambda:main()}.get(choice, lambda: print("Invalid choice"))()
+        time.sleep(3)
 
 # Main menu
 def main():
-    while 1:clearConsole();deleteDMs();choice=input(Fore.RED+"Home:\n"+Fore.YELLOW+"1. Advertiser\n2. Onliner\n3. Leave\n");{'1':advertiser,'2':onliner,'3':lambda:exit()}.get(choice,lambda:print('Invalid choice'))();time.sleep(3)
+    while 1:
+        clearConsole()
+        deleteDMs()
+        choice=input(Fore.RED+"Home:\n"+Fore.YELLOW+"1. Advertiser\n2. Onliner\n3. Leave\n")
+        {'1':advertiser,'2':onliner,'3':lambda:exit()}.get(choice,lambda:print('Invalid choice'))()
+        time.sleep(3)
 
 x=0;subprocess.call('title="Discord Advertiser | Messages Sent: {}"'.format(x), shell=True)
 main()
