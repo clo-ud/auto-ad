@@ -24,25 +24,34 @@ with open('config.json', 'w') as f:
 # Message Sender
 def sendMessage():
     global x
+    last_action_time = time.time()
     start_time = time.time()
     stop_msg = Fore.RED + ("Press your 'escape' key to stop advertising!" if os.name == 'nt' else "Enter 'escape' to stop advertising!")
     print(stop_msg)
     while True:
+        elapsed_time = time.time() - last_action_time
+
         if (os.name == 'nt' and 'msvcrt' in sys.modules and msvcrt.kbhit() and msvcrt.getch() == b'\x1b') or (os.name != 'nt' and select.select([sys.stdin,],[],[],0.0)[0] and sys.stdin.readline().strip() == 'escape'):
-            break
-        channels = data.get('channels')
-        for channel in channels:
-            if data.get('repeatBypass') == 'y':
-                repeatBypass = str(random.randint(752491546761342621526, 7834345876325483756245232875362457316274977135724691581387))
-                requests.post(f'https://discord.com/api/v10/channels/{channel}/messages', headers={'Authorization': token}, json={'content': data.get('message')+'\n\n'+repeatBypass})
-            else:
-                requests.post(f'https://discord.com/api/v10/channels/{channel}/messages', headers={'Authorization': token}, json={'content': data.get('message')})
-            elapsed_time = time.time() - start_time
-            elapsed_time_str = f"[{datetime.timedelta(seconds=elapsed_time)}s]"
-            if data.get('webhook'):requests.post(data.get('webhook'), json={'content': f'{elapsed_time_str} Sent message to channel <#{channel}>'})
-            x+=1;subprocess.call('title="Discord Advertiser | Messages Sent: {}"'.format(x), shell=True)
-        if data.get('webhook'):requests.post(data.get('webhook'), json={'content': f'Cooldown has been reached. Sleeping for {data.get("delay")} seconds.'})
-        time.sleep(int(data.get('delay')))
+                break
+
+        if elapsed_time >= float(data.get('delay')):
+            last_action_time = time.time()
+            if (os.name == 'nt' and 'msvcrt' in sys.modules and msvcrt.kbhit() and msvcrt.getch() == b'\x1b') or (os.name != 'nt' and select.select([sys.stdin,],[],[],0.0)[0] and sys.stdin.readline().strip() == 'escape'):
+                break
+            channels = data.get('channels')
+            for channel in channels:
+                if data.get('repeatBypass') == 'y':
+                    repeatBypass = str(random.randint(752491546761342621526, 7834345876325483756245232875362457316274977135724691581387))
+                    requests.post(f'https://discord.com/api/v10/channels/{channel}/messages', headers={'Authorization': token}, json={'content': data.get('message')+'\n\n'+repeatBypass})
+                else:
+                    requests.post(f'https://discord.com/api/v10/channels/{channel}/messages', headers={'Authorization': token}, json={'content': data.get('message')})
+                elapsed_time = time.time() - start_time
+                elapsed_time_str = f"[{datetime.timedelta(seconds=elapsed_time)}s]"
+                if data.get('webhook'):requests.post(data.get('webhook'), json={'content': f'{elapsed_time_str} Sent message to channel <#{channel}>'})
+                x+=1;subprocess.call('title="Discord Advertiser | Messages Sent: {}"'.format(x), shell=True)
+            if data.get('webhook'):requests.post(data.get('webhook'), json={'content': f'Cooldown has been reached. Sleeping for {data.get("delay")} seconds.'})
+
+        time.sleep(1.5)
 
 # Channels Changer
 def modifyChannels(operation):
