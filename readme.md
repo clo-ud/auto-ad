@@ -1,3 +1,3 @@
-`source venv/bin/activate`\n
-`pip install -r requirements.txt`\n
-`python main.py`\n
+> `source venv/bin/activate`  
+> `pip install -r requirements.txt`  
+> `python main.py`  
